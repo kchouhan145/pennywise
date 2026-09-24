@@ -1,0 +1,16 @@
+<section class="auth-page">
+  <div class="auth-intro">
+    <p class="eyebrow">Start simply</p>
+    <h1>Make room for clarity<span class="accent-dot">.</span></h1>
+    <p class="intro-copy">A gentle place to notice where your money goes.</p>
+  </div>
+  <form class="auth-form" method="post" action="/auth/register">
+    <div class="form-heading"><h2>Create your account</h2><p>It takes less than a minute.</p></div>
+    <% if (errors.length) { %><div class="form-errors" role="alert"><% errors.forEach((error) => { %><p><%= error.msg %></p><% }) %></div><% } %>
+    <label for="name">Name<input id="name" name="name" type="text" value="<%= formData.name %>" autocomplete="name" required autofocus /></label>
+    <label for="email">Email<input id="email" name="email" type="email" value="<%= formData.email %>" autocomplete="email" required /></label>
+    <label for="password">Password<input id="password" name="password" type="password" autocomplete="new-password" minlength="8" required /><small>Use at least 8 characters.</small></label>
+    <button class="primary-button" type="submit">Create account</button>
+    <p class="form-footer">Already have an account? <a href="/auth/login">Log in</a></p>
+  </form>
+</section>

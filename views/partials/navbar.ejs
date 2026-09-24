@@ -1,0 +1,24 @@
+<header class="site-header">
+  <nav class="nav-shell" aria-label="Main navigation">
+    <a class="brand" href="/" aria-label="Pennywise home">
+      <span class="brand-mark">P</span>
+      <span>Pennywise</span>
+    </a>
+    <% if (currentUser) { %>
+    <div class="nav-links">
+      <a class="nav-link <%= currentPath === '/' ? 'is-active' : '' %>" href="/">Home</a>
+      <a class="nav-link" href="#monthly">Monthly</a>
+      <a class="nav-link" href="#trips">Trips</a>
+      <a class="nav-link" href="#settings">Settings</a>
+    </div>
+    <form method="post" action="/auth/logout">
+      <button class="nav-logout" type="submit">Log out</button>
+    </form>
+    <% } else { %>
+    <div class="nav-links"><a class="nav-link" href="/auth/login">Log in</a><a class="nav-link nav-signup" href="/auth/register">Create account</a></div>
+    <% } %>
+    <button class="icon-button" type="button" aria-label="Toggle color theme" data-theme-toggle>
+      <span aria-hidden="true">◐</span>
+    </button>
+  </nav>
+</header>

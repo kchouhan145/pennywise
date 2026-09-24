@@ -1,0 +1,15 @@
+<section class="auth-page">
+  <div class="auth-intro">
+    <p class="eyebrow">Welcome back</p>
+    <h1>Pick up where you left off<span class="accent-dot">.</span></h1>
+    <p class="intro-copy">Your spending, waiting patiently.</p>
+  </div>
+  <form class="auth-form" method="post" action="/auth/login">
+    <div class="form-heading"><h2>Log in</h2><p>Continue to your dashboard.</p></div>
+    <% if (errors.length) { %><div class="form-errors" role="alert"><% errors.forEach((error) => { %><p><%= error.msg %></p><% }) %></div><% } %>
+    <label for="email">Email<input id="email" name="email" type="email" value="<%= formData.email %>" autocomplete="email" required autofocus /></label>
+    <label for="password">Password<input id="password" name="password" type="password" autocomplete="current-password" required /></label>
+    <button class="primary-button" type="submit">Log in</button>
+    <p class="form-footer">New to Pennywise? <a href="/auth/register">Create an account</a></p>
+  </form>
+</section>
