@@ -2,6 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 
 const User = require('../models/User');
+const Category = require('../models/Category');
 const { redirectIfAuthenticated } = require('../middleware/auth');
 
 const router = express.Router();
@@ -52,6 +53,7 @@ router.post('/register', redirectIfAuthenticated, registrationRules, async (req,
     const user = new User({ name: req.body.name, email: req.body.email });
     await user.setPassword(req.body.password);
     await user.save();
+    await Category.ensureDefaultCategories(user._id);
 
     req.session.userId = user.id;
     return req.session.save(() => res.redirect('/'));

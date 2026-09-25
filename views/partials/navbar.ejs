@@ -7,6 +7,7 @@
     <% if (currentUser) { %>
     <div class="nav-links">
       <a class="nav-link <%= currentPath === '/' ? 'is-active' : '' %>" href="/">Home</a>
+      <a class="nav-link <%= currentPath === '/categories' ? 'is-active' : '' %>" href="/categories">Categories</a>
       <a class="nav-link" href="#monthly">Monthly</a>
       <a class="nav-link" href="#trips">Trips</a>
       <a class="nav-link" href="#settings">Settings</a>

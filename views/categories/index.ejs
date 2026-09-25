@@ -1,0 +1,65 @@
+<section class="page-section reveal">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Organize</p>
+      <h2>Categories</h2>
+    </div>
+    <a class="text-link" href="/">Back to home</a>
+  </div>
+
+  <div class="category-layout">
+    <form class="panel-form" method="post" action="/categories">
+      <h3>Add category</h3>
+      <% if (errors.length) { %>
+        <div class="form-errors" role="alert">
+          <% errors.forEach((error) => { %><p><%= error.msg %></p><% }) %>
+        </div>
+      <% } %>
+
+      <label>
+        Name
+        <input type="text" name="name" value="<%= formData.name %>" maxlength="40" required />
+      </label>
+      <div class="input-row two-up">
+        <label>
+          Color
+          <input type="color" name="color" value="<%= formData.color %>" />
+        </label>
+        <label>
+          Icon
+          <input type="text" name="icon" value="<%= formData.icon %>" maxlength="4" />
+        </label>
+      </div>
+      <button class="primary-button" type="submit">Save category</button>
+    </form>
+
+    <div class="category-list-wrap">
+      <% if (!categories.length) { %>
+        <div class="empty-state compact">
+          <div class="empty-icon" aria-hidden="true">✦</div>
+          <h3>No categories yet</h3>
+          <p>Start with a few useful labels for your spending.</p>
+        </div>
+      <% } else { %>
+        <div class="category-list">
+          <% categories.forEach((category) => { %>
+            <div class="category-item">
+              <div class="category-row">
+                <span class="category-swatch" style="background:<%= category.color %>"><%= category.icon %></span>
+                <div>
+                  <strong><%= category.name %></strong>
+                  <% if (category.isDefault) { %><small>Default</small><% } %>
+                </div>
+              </div>
+              <% if (!category.isDefault) { %>
+                <form method="post" action="/categories/<%= category._id %>/delete" onsubmit="return confirm('Delete this category and move its expenses to Other?');">
+                  <button class="ghost-button" type="submit">Delete</button>
+                </form>
+              <% } %>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</section>

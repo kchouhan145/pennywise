@@ -6,6 +6,8 @@ const createSessionMiddleware = require('./config/session');
 const { loadCurrentUser } = require('./middleware/auth');
 const authRoutes = require('./routes/auth');
 const homeRoutes = require('./routes/home');
+const categoryRoutes = require('./routes/categories');
+const expenseRoutes = require('./routes/expenses');
 
 const app = express();
 
@@ -24,6 +26,8 @@ app.locals.appName = 'Pennywise';
 app.locals.currencySymbol = '₹';
 
 app.use('/auth', authRoutes);
+app.use('/categories', categoryRoutes);
+app.use('/expenses', expenseRoutes);
 app.use('/', homeRoutes);
 
 app.use((req, res) => {
