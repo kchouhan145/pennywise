@@ -1,3 +1,4 @@
+process.noDeprecation = true;
 require('dotenv').config();
 
 const app = require('./app');

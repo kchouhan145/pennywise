@@ -1,0 +1,147 @@
+<section class="page-section reveal">
+  <div class="report-header">
+    <div>
+      <p class="eyebrow">Trip overview</p>
+      <h1><%= trip.name %><span class="accent-dot">.</span></h1>
+    </div>
+    <a class="text-link" href="/trips">Back to trips</a>
+  </div>
+
+  <div class="report-summary-grid">
+    <article class="summary-card summary-card-main">
+      <div class="card-heading">
+        <span>Budget vs spent</span>
+        <span class="status-pill"><%= trip.status %></span>
+      </div>
+      <p class="amount-large"><%= trip.currency %> <%= summary.spent.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></p>
+      <div class="progress-track" role="progressbar" aria-label="Trip budget used" aria-valuenow="<%= Math.round(summary.percentUsed) %>" aria-valuemin="0" aria-valuemax="100">
+        <span style="width: <%= `${Math.min(summary.percentUsed, 100)}%` %>"></span>
+      </div>
+      <div class="card-meta">
+        <span>Budget: <%= trip.currency %> <%= trip.budget.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></span>
+        <span><%= trip.currency %> <%= summary.remaining.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %> left</span>
+      </div>
+    </article>
+
+    <article class="summary-card">
+      <span class="card-label">Trip details</span>
+      <p class="amount-medium"><%= trip.destination %></p>
+      <p class="muted-copy"><%= new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(trip.startDate)) %> → <%= new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(trip.endDate)) %></p>
+    </article>
+  </div>
+
+  <div class="panel-grid">
+    <section class="panel-block">
+      <div class="panel-header">
+        <h2>Add trip expense</h2>
+      </div>
+      <form class="mini-form" method="post" action="/trips/<%= trip._id %>/expenses">
+        <div class="input-row two-up">
+          <label>
+            Amount
+            <input type="number" step="0.01" min="0.01" name="amount" required />
+          </label>
+          <label>
+            Payment method
+            <select name="paymentMethod">
+              <option value="Card">Card</option>
+              <option value="Cash">Cash</option>
+              <option value="UPI">UPI</option>
+              <option value="Other">Other</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="input-row two-up">
+          <label>
+            Category
+            <select name="category" required>
+              <% categories.forEach((category) => { %>
+                <option value="<%= category._id %>"><%= category.name %></option>
+              <% }) %>
+            </select>
+          </label>
+          <label>
+            Date
+            <input type="date" name="date" value="<%= new Date().toISOString().slice(0, 10) %>" required />
+          </label>
+        </div>
+
+        <label>
+          Note
+          <input type="text" name="note" placeholder="Hotel, meals, transfers..." />
+        </label>
+
+        <button class="primary-button" type="submit">Save expense</button>
+      </form>
+    </section>
+
+    <section class="panel-block">
+      <div class="panel-header">
+        <h2>Category breakdown</h2>
+      </div>
+      <% if (categoryBreakdown.length) { %>
+        <ul class="category-summary-list">
+          <% categoryBreakdown.forEach((category) => { %>
+            <li>
+              <span class="inline-category">
+                <span class="category-dot" style="background: <%= category.color || '#2d7958' %>"></span>
+                <%= category.name %>
+              </span>
+              <strong><%= trip.currency %> <%= Number(category.total).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></strong>
+            </li>
+          <% }) %>
+        </ul>
+      <% } else { %>
+        <div class="empty-state compact">
+          <div class="empty-icon" aria-hidden="true">✦</div>
+          <h3>No trip expenses yet</h3>
+          <p>Add a spend to start tracking the trip budget.</p>
+        </div>
+      <% } %>
+    </section>
+  </div>
+
+  <section class="panel-block report-table-wrap">
+    <div class="panel-header">
+      <h2>Trip expense list</h2>
+    </div>
+    <% if (expenses.length) { %>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Category</th>
+              <th>Note</th>
+              <th>Method</th>
+              <th class="amount-column">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% expenses.forEach((expense) => { %>
+              <tr>
+                <td><%= expense.dateLabel %></td>
+                <td>
+                  <span class="inline-category">
+                    <span class="category-dot" style="background: <%= expense.category?.color || '#64748b' %>"></span>
+                    <%= expense.category?.name || 'Uncategorized' %>
+                  </span>
+                </td>
+                <td><%= expense.note || '—' %></td>
+                <td><%= expense.paymentMethod %></td>
+                <td class="amount-column"><%= trip.currency %> <%= expense.formattedAmount %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <div class="empty-state compact">
+        <div class="empty-icon" aria-hidden="true">✦</div>
+        <h3>No trip activity</h3>
+        <p>Your trip is clean so far.</p>
+      </div>
+    <% } %>
+  </section>
+</section>

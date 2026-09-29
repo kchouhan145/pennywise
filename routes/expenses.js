@@ -13,6 +13,7 @@ const expenseRules = [
   body('date').optional().isISO8601().withMessage('Enter a valid date.'),
   body('paymentMethod').optional().isIn(['Cash', 'UPI', 'Card', 'Other']).withMessage('Choose a payment method.'),
   body('note').optional().trim().isLength({ max: 240 }).withMessage('Notes are limited to 240 characters.'),
+  body('trip').optional().isMongoId().withMessage('Choose a valid trip.'),
 ];
 
 router.use(requireAuth);
@@ -73,10 +74,11 @@ router.post('/', expenseRules, async (req, res, next) => {
       date: req.body.date ? new Date(req.body.date) : new Date(),
       note: req.body.note || '',
       paymentMethod: req.body.paymentMethod || 'Card',
+      trip: req.body.trip || null,
       tags: Array.isArray(req.body.tags) ? req.body.tags : [],
     });
 
-    return res.redirect('/');
+    return req.body.trip ? res.redirect(`/trips/${req.body.trip}`) : res.redirect('/');
   } catch (error) {
     return next(error);
   }
@@ -142,9 +144,10 @@ router.post('/:id/update', expenseRules, async (req, res, next) => {
     expense.date = req.body.date ? new Date(req.body.date) : expense.date;
     expense.note = req.body.note || '';
     expense.paymentMethod = req.body.paymentMethod || 'Card';
+    expense.trip = req.body.trip || null;
 
     await expense.save();
-    return res.redirect('/');
+    return req.body.trip ? res.redirect(`/trips/${req.body.trip}`) : res.redirect('/');
   } catch (error) {
     return next(error);
   }

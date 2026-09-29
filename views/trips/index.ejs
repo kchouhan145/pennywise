@@ -1,0 +1,39 @@
+<section class="page-section reveal">
+  <div class="report-header">
+    <div>
+      <p class="eyebrow">Trips</p>
+      <h1>Travel budget overview<span class="accent-dot">.</span></h1>
+    </div>
+    <a class="primary-button" href="/trips/new">New trip</a>
+  </div>
+
+  <% if (trips.length) { %>
+    <div class="trip-grid">
+      <% trips.forEach((trip) => { %>
+        <article class="trip-card">
+          <div class="trip-card-header">
+            <div>
+              <h3><%= trip.name %></h3>
+              <p><%= trip.destination %></p>
+            </div>
+            <span class="status-pill"><%= trip.status %></span>
+          </div>
+          <div class="trip-meta">
+            <span><%= new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short' }).format(new Date(trip.startDate)) %> → <%= new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(trip.endDate)) %></span>
+            <span><%= trip.currency %> <%= Number(trip.budget).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></span>
+          </div>
+          <div class="trip-link-row">
+            <a class="text-link" href="/trips/<%= trip._id %>">Open trip <span aria-hidden="true">↗</span></a>
+          </div>
+        </article>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <div class="empty-state">
+      <div class="empty-icon" aria-hidden="true">✦</div>
+      <h3>No trips yet</h3>
+      <p>Create a trip to track spending, dates and budget in one place.</p>
+      <a class="secondary-button" href="/trips/new">Create your first trip</a>
+    </div>
+  <% } %>
+</section>

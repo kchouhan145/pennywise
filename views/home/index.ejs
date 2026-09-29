@@ -1,7 +1,7 @@
 <section class="dashboard-intro page-section reveal">
   <div>
     <p class="eyebrow">Your money, made clear</p>
-    <h1>Good morning<span class="accent-dot">.</span></h1>
+    <h1><%= greeting %><span class="accent-dot">.</span></h1>
     <p class="intro-copy">A quiet view of your spending for <strong><%= monthName %></strong>.</p>
   </div>
   <button class="primary-button" type="button" data-add-expense>
@@ -11,10 +11,18 @@
 
 <section class="summary-grid page-section reveal" aria-label="Monthly summary">
   <article class="summary-card summary-card-main">
-    <div class="card-heading"><span>Spent this month</span><span class="status-pill"><%= summary.budget ? 'On track' : 'No budget' %></span></div>
+    <div class="card-heading">
+      <span>Spent this month</span>
+      <span class="status-pill"><%= summary.budget ? (summary.percentUsed >= 100 ? 'At limit' : 'On track') : 'No budget' %></span>
+    </div>
     <p class="amount-large"><%= currencySymbol %><%= summary.spent.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></p>
-    <div class="progress-track" role="progressbar" aria-label="Monthly budget used" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><span style="width: 0%"></span></div>
-    <div class="card-meta"><span><%= summary.budget ? 'Budget set' : 'Budget not set' %></span><span><%= currencySymbol %><%= summary.remaining.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %> left</span></div>
+    <div class="progress-track" role="progressbar" aria-label="Monthly budget used" aria-valuenow="<%= Math.round(summary.percentUsed) %>" aria-valuemin="0" aria-valuemax="100">
+      <span style="width: <%= summary.progressWidth %>"></span>
+    </div>
+    <div class="card-meta">
+      <span><%= summary.budget ? 'Budget set' : 'Budget not set' %></span>
+      <span><%= currencySymbol %><%= summary.remaining.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %> left</span>
+    </div>
   </article>
   <article class="summary-card">
     <span class="card-label">Today</span>
@@ -67,8 +75,8 @@
 </section>
 
 <section class="quick-links page-section reveal" aria-label="More views">
-  <a class="quick-link" href="#monthly"><span><strong>Monthly report</strong><small>See where your money goes</small></span><span aria-hidden="true">↗</span></a>
-  <a class="quick-link" href="/categories"><span><strong>Categories</strong><small>Keep your labels tidy</small></span><span aria-hidden="true">↗</span></a>
+  <a class="quick-link" href="/reports"><span><strong>Monthly report</strong><small>See where your money goes</small></span><span aria-hidden="true">↗</span></a>
+  <a class="quick-link" href="/trips"><span><strong>Trips</strong><small>Keep your travel spending in check</small></span><span aria-hidden="true">↗</span></a>
 </section>
 
 <%- include('../partials/expense-modal') %>

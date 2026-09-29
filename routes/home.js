@@ -2,6 +2,7 @@ const express = require('express');
 
 const Expense = require('../models/Expense');
 const Category = require('../models/Category');
+const MonthlyBudget = require('../models/MonthlyBudget');
 const { requireAuth } = require('../middleware/auth');
 
 const router = express.Router();
@@ -12,8 +13,10 @@ router.get('/', requireAuth, async (req, res, next) => {
     const currentDate = new Date();
     const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
     const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+    const hour = currentDate.getHours();
+    const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 
-    const [monthlySummary, todaySummary, recentExpenses, categories] = await Promise.all([
+    const [monthlySummary, todaySummary, recentExpenses, categories, monthlyBudget] = await Promise.all([
       Expense.aggregate([
         {
           $match: {
@@ -54,15 +57,21 @@ router.get('/', requireAuth, async (req, res, next) => {
         .limit(5)
         .lean(),
       Category.find({ user: userId }).sort({ name: 1 }).lean(),
+      MonthlyBudget.findOne({
+        user: userId,
+        month: `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`,
+      }).lean(),
     ]);
 
     const spent = monthlySummary[0]?.total || 0;
     const todaySpent = todaySummary[0]?.total || 0;
-    const budget = 0;
+    const budget = Number(monthlyBudget?.amount || 0);
+    const percentUsed = budget > 0 ? Math.min((spent / budget) * 100, 100) : 0;
 
     res.render('home/index', {
       pageTitle: 'Home',
       currentPath: '/',
+      greeting,
       monthName: new Intl.DateTimeFormat('en-IN', { month: 'long' }).format(currentDate),
       categories,
       summary: {
@@ -70,6 +79,8 @@ router.get('/', requireAuth, async (req, res, next) => {
         budget,
         remaining: budget - spent,
         today: todaySpent,
+        percentUsed,
+        progressWidth: `${percentUsed}%`,
       },
       recentExpenses: recentExpenses.map((expense) => ({
         ...expense,

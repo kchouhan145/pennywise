@@ -8,6 +8,8 @@ const authRoutes = require('./routes/auth');
 const homeRoutes = require('./routes/home');
 const categoryRoutes = require('./routes/categories');
 const expenseRoutes = require('./routes/expenses');
+const reportsRoutes = require('./routes/reports');
+const tripsRoutes = require('./routes/trips');
 
 const app = express();
 
@@ -28,6 +30,8 @@ app.locals.currencySymbol = '₹';
 app.use('/auth', authRoutes);
 app.use('/categories', categoryRoutes);
 app.use('/expenses', expenseRoutes);
+app.use('/reports', reportsRoutes);
+app.use('/trips', tripsRoutes);
 app.use('/', homeRoutes);
 
 app.use((req, res) => {

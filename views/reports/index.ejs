@@ -1,0 +1,241 @@
+<section class="report-page page-section reveal">
+  <div class="report-header">
+    <div>
+      <p class="eyebrow">Monthly command center</p>
+      <h1><%= monthName %><span class="accent-dot">.</span></h1>
+    </div>
+    <form class="month-switcher" method="get" action="/reports">
+      <label>
+        <span class="sr-only">Choose month</span>
+        <select name="month" onchange="this.form.submit()">
+          <% monthOptions.forEach((option) => { %>
+            <option value="<%= option.value %>" <%= option.value === month ? 'selected' : '' %>><%= option.label %></option>
+          <% }) %>
+        </select>
+      </label>
+    </form>
+  </div>
+
+  <div class="report-summary-grid">
+    <article class="summary-card summary-card-main">
+      <div class="card-heading">
+        <span>Total spent</span>
+        <span class="status-pill"><%= summary.budget ? (summary.percentUsed >= 100 ? 'At limit' : 'On track') : 'No budget' %></span>
+      </div>
+      <p class="amount-large"><%= currencySymbol %><%= summary.spent.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></p>
+      <div class="progress-track" role="progressbar" aria-label="Monthly budget used" aria-valuenow="<%= Math.round(summary.percentUsed) %>" aria-valuemin="0" aria-valuemax="100">
+        <span style="width: <%= summary.budget ? `${Math.min(summary.percentUsed, 100)}%` : '0%' %>"></span>
+      </div>
+      <div class="card-meta">
+        <span>Budget: <%= currencySymbol %><%= summary.budget.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></span>
+        <span><%= currencySymbol %><%= summary.remaining.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %> left</span>
+      </div>
+    </article>
+
+    <article class="summary-card">
+      <span class="card-label">Safe daily spend</span>
+      <p class="amount-medium"><%= currencySymbol %><%= summary.safeDailySpend.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></p>
+      <p class="muted-copy"><%= summary.budget ? 'Stay under this amount each day to stay on target.' : 'Set a budget to unlock the safe daily target.' %></p>
+    </article>
+  </div>
+
+  <div class="panel-grid">
+    <section class="panel-block">
+      <div class="panel-header">
+        <h2>Set monthly budget</h2>
+      </div>
+      <form class="mini-form" method="post" action="/reports/budget">
+        <input type="hidden" name="month" value="<%= month %>" />
+        <label>
+          Budget amount
+          <input type="number" name="amount" min="0" step="0.01" value="<%= summary.budget %>" placeholder="25000" required />
+        </label>
+        <button class="primary-button" type="submit">Save budget</button>
+      </form>
+    </section>
+
+    <section class="panel-block">
+      <div class="panel-header">
+        <h2>Filters</h2>
+      </div>
+      <form class="filter-form" method="get" action="/reports">
+        <input type="hidden" name="month" value="<%= month %>" />
+        <div class="input-row two-up">
+          <label>
+            Category
+            <select name="category">
+              <option value="">All</option>
+              <% categories.forEach((category) => { %>
+                <option value="<%= category._id %>" <%= filters.category === String(category._id) ? 'selected' : '' %>><%= category.name %></option>
+              <% }) %>
+            </select>
+          </label>
+          <label>
+            Payment method
+            <select name="paymentMethod">
+              <option value="All" <%= filters.paymentMethod === 'All' ? 'selected' : '' %>>All</option>
+              <option value="Cash" <%= filters.paymentMethod === 'Cash' ? 'selected' : '' %>>Cash</option>
+              <option value="UPI" <%= filters.paymentMethod === 'UPI' ? 'selected' : '' %>>UPI</option>
+              <option value="Card" <%= filters.paymentMethod === 'Card' ? 'selected' : '' %>>Card</option>
+              <option value="Other" <%= filters.paymentMethod === 'Other' ? 'selected' : '' %>>Other</option>
+            </select>
+          </label>
+        </div>
+        <div class="input-row two-up">
+          <label>
+            From
+            <input type="date" name="startDate" value="<%= filters.startDate %>" />
+          </label>
+          <label>
+            To
+            <input type="date" name="endDate" value="<%= filters.endDate %>" />
+          </label>
+        </div>
+        <label>
+          Search note
+          <input type="search" name="search" value="<%= filters.search %>" placeholder="Groceries, rent, travel" />
+        </label>
+        <button class="secondary-button" type="submit">Apply filters</button>
+      </form>
+    </section>
+  </div>
+
+  <div class="chart-grid">
+    <section class="panel-block chart-panel">
+      <div class="panel-header">
+        <h2>Category breakdown</h2>
+      </div>
+      <% if (categoryBreakdown.length) { %>
+        <canvas id="categoryChart" height="220"></canvas>
+      <% } else { %>
+        <div class="empty-state compact">
+          <div class="empty-icon" aria-hidden="true">✦</div>
+          <h3>No category spending yet</h3>
+          <p>Nothing was tracked in this month’s report.</p>
+        </div>
+      <% } %>
+    </section>
+
+    <section class="panel-block chart-panel">
+      <div class="panel-header">
+        <h2>Daily spending</h2>
+      </div>
+      <% if (dailyTotals.some((day) => day.total > 0)) { %>
+        <canvas id="dailyChart" height="220"></canvas>
+      <% } else { %>
+        <div class="empty-state compact">
+          <div class="empty-icon" aria-hidden="true">✦</div>
+          <h3>No daily totals</h3>
+          <p>Spend a little to see the curve form.</p>
+        </div>
+      <% } %>
+    </section>
+  </div>
+
+  <section class="panel-block report-table-wrap">
+    <div class="panel-header">
+      <h2>Expense history</h2>
+    </div>
+    <% if (expenses.length) { %>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Category</th>
+              <th>Note</th>
+              <th>Method</th>
+              <th class="amount-column">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% expenses.forEach((expense) => { %>
+              <tr>
+                <td><%= expense.dateLabel %></td>
+                <td>
+                  <span class="inline-category">
+                    <span class="category-dot" style="background: <%= expense.category?.color || '#64748b' %>"></span>
+                    <%= expense.category?.name || 'Uncategorized' %>
+                  </span>
+                </td>
+                <td><%= expense.note || '—' %></td>
+                <td><%= expense.paymentMethod %></td>
+                <td class="amount-column"><%= currencySymbol %><%= expense.formattedAmount %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <div class="empty-state compact">
+        <div class="empty-icon" aria-hidden="true">✦</div>
+        <h3>No matching expenses</h3>
+        <p>Adjust your filters or add a new expense.</p>
+      </div>
+    <% } %>
+  </section>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const categoryChartEl = document.getElementById('categoryChart');
+  if (categoryChartEl) {
+    const categoryLabels = <%- JSON.stringify(categoryBreakdown.map((item) => item.name)) %>;
+    const categoryValues = <%- JSON.stringify(categoryBreakdown.map((item) => item.total)) %>;
+    const categoryColors = <%- JSON.stringify(categoryBreakdown.map((item) => item.color || '#2d7958')) %>;
+
+    new Chart(categoryChartEl, {
+      type: 'doughnut',
+      data: {
+        labels: categoryLabels,
+        datasets: [{
+          data: categoryValues,
+          backgroundColor: categoryColors,
+          borderWidth: 0,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom' },
+        },
+        cutout: '58%',
+      },
+    });
+  }
+
+  const dailyChartEl = document.getElementById('dailyChart');
+  if (dailyChartEl) {
+    const dayLabels = <%- JSON.stringify(dailyTotals.map((day) => `${day.day}`)) %>;
+    const dayValues = <%- JSON.stringify(dailyTotals.map((day) => day.total)) %>;
+
+    new Chart(dailyChartEl, {
+      type: 'bar',
+      data: {
+        labels: dayLabels,
+        datasets: [{
+          label: 'Spend',
+          data: dayValues,
+          backgroundColor: '#2d7958',
+          borderRadius: 6,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: (value) => `₹${value}`,
+            },
+          },
+        },
+      },
+    });
+  }
+</script>

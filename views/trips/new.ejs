@@ -1,0 +1,59 @@
+<section class="page-section reveal">
+  <div class="report-header">
+    <div>
+      <p class="eyebrow">Plan a new trip</p>
+      <h1>Create trip<span class="accent-dot">.</span></h1>
+    </div>
+    <a class="text-link" href="/trips">Back to trips</a>
+  </div>
+
+  <% if (errors && errors.length) { %>
+    <div class="form-errors">
+      <% errors.forEach((error) => { %>
+        <p><%= error.msg %></p>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <form class="panel-form" method="post" action="/trips">
+    <div class="input-row two-up">
+      <label>
+        Trip name
+        <input type="text" name="name" value="<%= formData.name %>" required />
+      </label>
+      <label>
+        Destination
+        <input type="text" name="destination" value="<%= formData.destination %>" required />
+      </label>
+    </div>
+
+    <div class="input-row two-up">
+      <label>
+        Start date
+        <input type="date" name="startDate" value="<%= formData.startDate %>" required />
+      </label>
+      <label>
+        End date
+        <input type="date" name="endDate" value="<%= formData.endDate %>" required />
+      </label>
+    </div>
+
+    <div class="input-row two-up">
+      <label>
+        Budget
+        <input type="number" name="budget" min="0" step="0.01" value="<%= formData.budget %>" required />
+      </label>
+      <label>
+        Currency
+        <select name="currency">
+          <option value="INR" <%= formData.currency === 'INR' ? 'selected' : '' %>>INR</option>
+          <option value="USD" <%= formData.currency === 'USD' ? 'selected' : '' %>>USD</option>
+          <option value="EUR" <%= formData.currency === 'EUR' ? 'selected' : '' %>>EUR</option>
+          <option value="GBP" <%= formData.currency === 'GBP' ? 'selected' : '' %>>GBP</option>
+        </select>
+      </label>
+    </div>
+
+    <button class="primary-button" type="submit">Create trip</button>
+  </form>
+</section>
