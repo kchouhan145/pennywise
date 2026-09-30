@@ -14,7 +14,38 @@ const expenseRules = [
   body('paymentMethod').optional().isIn(['Cash', 'UPI', 'Card', 'Other']).withMessage('Choose a payment method.'),
   body('note').optional().trim().isLength({ max: 240 }).withMessage('Notes are limited to 240 characters.'),
   body('trip').optional().isMongoId().withMessage('Choose a valid trip.'),
+  body('paidBy').optional().trim().isLength({ max: 80 }).withMessage('Paid-by values are limited to 80 characters.'),
 ];
+
+function normalizeTags(rawTags) {
+  if (Array.isArray(rawTags)) {
+    return rawTags.map((tag) => String(tag).trim()).filter(Boolean);
+  }
+
+  if (typeof rawTags === 'string') {
+    return rawTags
+      .split(',')
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+  }
+
+  return [];
+}
+
+function normalizeSplitAmong(rawSplitAmong) {
+  if (Array.isArray(rawSplitAmong)) {
+    return rawSplitAmong.map((person) => String(person).trim()).filter(Boolean);
+  }
+
+  if (typeof rawSplitAmong === 'string') {
+    return rawSplitAmong
+      .split(',')
+      .map((person) => person.trim())
+      .filter(Boolean);
+  }
+
+  return [];
+}
 
 router.use(requireAuth);
 
@@ -75,7 +106,9 @@ router.post('/', expenseRules, async (req, res, next) => {
       note: req.body.note || '',
       paymentMethod: req.body.paymentMethod || 'Card',
       trip: req.body.trip || null,
-      tags: Array.isArray(req.body.tags) ? req.body.tags : [],
+      tags: normalizeTags(req.body.tags),
+      paidBy: req.body.paidBy || null,
+      splitAmong: normalizeSplitAmong(req.body.splitAmong),
     });
 
     return req.body.trip ? res.redirect(`/trips/${req.body.trip}`) : res.redirect('/');
@@ -145,6 +178,9 @@ router.post('/:id/update', expenseRules, async (req, res, next) => {
     expense.note = req.body.note || '';
     expense.paymentMethod = req.body.paymentMethod || 'Card';
     expense.trip = req.body.trip || null;
+    expense.tags = normalizeTags(req.body.tags);
+    expense.paidBy = req.body.paidBy || null;
+    expense.splitAmong = normalizeSplitAmong(req.body.splitAmong);
 
     await expense.save();
     return req.body.trip ? res.redirect(`/trips/${req.body.trip}`) : res.redirect('/');

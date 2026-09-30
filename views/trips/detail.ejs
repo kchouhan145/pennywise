@@ -27,6 +27,9 @@
       <span class="card-label">Trip details</span>
       <p class="amount-medium"><%= trip.destination %></p>
       <p class="muted-copy"><%= new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(trip.startDate)) %> → <%= new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(trip.endDate)) %></p>
+      <div class="card-meta" style="margin-top: 16px;">
+        <a class="text-link" href="/trips/<%= trip._id %>/export">Export trip CSV</a>
+      </div>
     </article>
   </div>
 
@@ -71,6 +74,22 @@
           Note
           <input type="text" name="note" placeholder="Hotel, meals, transfers..." />
         </label>
+
+        <label>
+          Tags
+          <input type="text" name="tags" placeholder="#flight, #food" />
+        </label>
+
+        <div class="input-row two-up">
+          <label>
+            Paid by
+            <input type="text" name="paidBy" placeholder="Your name" />
+          </label>
+          <label>
+            Split among
+            <input type="text" name="splitAmong" placeholder="Ava, Liam" />
+          </label>
+        </div>
 
         <button class="primary-button" type="submit">Save expense</button>
       </form>
@@ -128,7 +147,7 @@
                     <%= expense.category?.name || 'Uncategorized' %>
                   </span>
                 </td>
-                <td><%= expense.note || '—' %></td>
+                <td><%= expense.note || '—' %><% if (expense.tags && expense.tags.length) { %><br><small class="muted-copy"><%= expense.tags.join(', ') %></small><% } %></td>
                 <td><%= expense.paymentMethod %></td>
                 <td class="amount-column"><%= trip.currency %> <%= expense.formattedAmount %></td>
               </tr>

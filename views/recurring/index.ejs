@@ -1,0 +1,116 @@
+<section class="page-section reveal">
+  <div class="report-header">
+    <div>
+      <p class="eyebrow">Recurring</p>
+      <h1>Scheduled spend<span class="accent-dot">.</span></h1>
+    </div>
+    <a class="text-link" href="/">Back to home</a>
+  </div>
+
+  <div class="panel-grid">
+    <section class="panel-block">
+      <div class="panel-header">
+        <h2>Add repeated expense</h2>
+      </div>
+
+      <% if (errors.length) { %>
+        <div class="form-errors" role="alert">
+          <% errors.forEach((error) => { %><p><%= error.msg %></p><% }) %>
+        </div>
+      <% } %>
+
+      <form class="mini-form" method="post" action="/recurring">
+        <div class="input-row two-up">
+          <label>
+            Amount
+            <input type="number" name="amount" min="0.01" step="0.01" value="<%= formData.amount %>" required />
+          </label>
+          <label>
+            Payment method
+            <select name="paymentMethod">
+              <option value="Card" <%= formData.paymentMethod === 'Card' ? 'selected' : '' %>>Card</option>
+              <option value="Cash" <%= formData.paymentMethod === 'Cash' ? 'selected' : '' %>>Cash</option>
+              <option value="UPI" <%= formData.paymentMethod === 'UPI' ? 'selected' : '' %>>UPI</option>
+              <option value="Other" <%= formData.paymentMethod === 'Other' ? 'selected' : '' %>>Other</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="input-row two-up">
+          <label>
+            Category
+            <select name="category" required>
+              <% categories.forEach((category) => { %>
+                <option value="<%= category._id %>" <%= String(category._id) === String(formData.category) ? 'selected' : '' %>><%= category.name %></option>
+              <% }) %>
+            </select>
+          </label>
+          <label>
+            Frequency
+            <select name="frequency">
+              <option value="daily" <%= formData.frequency === 'daily' ? 'selected' : '' %>>Daily</option>
+              <option value="weekly" <%= formData.frequency === 'weekly' ? 'selected' : '' %>>Weekly</option>
+              <option value="monthly" <%= formData.frequency === 'monthly' ? 'selected' : '' %>>Monthly</option>
+            </select>
+          </label>
+        </div>
+
+        <label>
+          Next run date
+          <input type="date" name="nextRunDate" value="<%= formData.nextRunDate %>" required />
+        </label>
+
+        <label>
+          Note
+          <input type="text" name="note" maxlength="240" value="<%= formData.note %>" placeholder="Rent, car EMI, streaming..." />
+        </label>
+
+        <label>
+          Tags
+          <input type="text" name="tags" value="<%= formData.tags %>" placeholder="#home, #utilities" />
+        </label>
+
+        <button class="primary-button" type="submit">Save recurring rule</button>
+      </form>
+    </section>
+
+    <section class="panel-block">
+      <div class="panel-header">
+        <h2>Recurring items</h2>
+      </div>
+
+      <% if (recurring.length) { %>
+        <div class="expense-list">
+          <% recurring.forEach((item) => { %>
+            <article class="expense-item">
+              <div class="expense-info">
+                <span class="expense-badge" style="background: <%= item.category?.color || '#2d7958' %>"><%= item.category?.icon || '•' %></span>
+                <div>
+                  <strong><%= item.category?.name || 'Uncategorized' %></strong>
+                  <small><%= item.frequency %> • <%= item.note || 'Recurring expense' %></small>
+                </div>
+              </div>
+              <div class="expense-amount-wrap">
+                <span class="expense-amount">₹<%= item.formattedAmount %></span>
+                <div class="expense-actions">
+                  <form method="post" action="/recurring/<%= item._id %>/toggle">
+                    <button type="submit" class="link-button"><%= item.active ? 'Pause' : 'Resume' %></button>
+                  </form>
+                  <form method="post" action="/recurring/<%= item._id %>/delete">
+                    <button type="submit" class="link-button">Delete</button>
+                  </form>
+                </div>
+              </div>
+            </article>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <div class="empty-state compact">
+          <div class="empty-icon" aria-hidden="true">✦</div>
+          <h3>No recurring rules yet</h3>
+          <p>Track rent, EMIs, and subscriptions in one place.</p>
+        </div>
+      <% } %>
+    </section>
+  </div>
+</section>

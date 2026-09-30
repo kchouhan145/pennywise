@@ -33,14 +33,33 @@
       </label>
 
       <label>
-        Payment method
-        <select name="paymentMethod">
-          <option value="Cash">Cash</option>
-          <option value="UPI">UPI</option>
-          <option value="Card" selected>Card</option>
-          <option value="Other">Other</option>
-        </select>
+        Tags
+        <input type="text" name="tags" placeholder="#gift, #work" />
       </label>
+
+      <div class="input-row two-up">
+        <label>
+          Payment method
+          <select name="paymentMethod">
+            <option value="Cash">Cash</option>
+            <option value="UPI">UPI</option>
+            <option value="Card" selected>Card</option>
+            <option value="Other">Other</option>
+          </select>
+        </label>
+
+        <% if (trips && trips.length) { %>
+          <label>
+            Trip
+            <select name="trip">
+              <option value="">No trip</option>
+              <% trips.forEach((trip) => { %>
+                <option value="<%= trip._id %>"><%= trip.name %></option>
+              <% }) %>
+            </select>
+          </label>
+        <% } %>
+      </div>
 
       <button class="primary-button" type="submit">Save expense</button>
     </form>

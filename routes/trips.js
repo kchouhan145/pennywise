@@ -23,7 +23,42 @@ const expenseRules = [
   body('date').optional().isISO8601().withMessage('Enter a valid date.'),
   body('paymentMethod').optional().isIn(['Cash', 'UPI', 'Card', 'Other']).withMessage('Choose a payment method.'),
   body('note').optional().trim().isLength({ max: 240 }).withMessage('Notes are limited to 240 characters.'),
+  body('paidBy').optional().trim().isLength({ max: 80 }).withMessage('Paid-by values are limited to 80 characters.'),
 ];
+
+function normalizeTags(rawTags) {
+  if (Array.isArray(rawTags)) {
+    return rawTags.map((tag) => String(tag).trim()).filter(Boolean);
+  }
+
+  if (typeof rawTags === 'string') {
+    return rawTags
+      .split(',')
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+  }
+
+  return [];
+}
+
+function normalizeSplitAmong(rawSplitAmong) {
+  if (Array.isArray(rawSplitAmong)) {
+    return rawSplitAmong.map((person) => String(person).trim()).filter(Boolean);
+  }
+
+  if (typeof rawSplitAmong === 'string') {
+    return rawSplitAmong
+      .split(',')
+      .map((person) => person.trim())
+      .filter(Boolean);
+  }
+
+  return [];
+}
+
+function escapeCsv(value) {
+  return `"${String(value ?? '').replace(/"/g, '""')}"`;
+}
 
 function getTripStatus(trip) {
   const today = new Date();
@@ -36,6 +71,40 @@ function getTripStatus(trip) {
 }
 
 router.use(requireAuth);
+
+router.get('/:id/export', async (req, res, next) => {
+  try {
+    const trip = await Trip.findOne({ _id: req.params.id, user: req.session.userId }).lean();
+    if (!trip) {
+      return res.redirect('/trips');
+    }
+
+    const expenses = await Expense.find({ user: req.session.userId, trip: trip._id })
+      .sort({ date: -1, createdAt: -1 })
+      .populate('category', 'name')
+      .lean();
+
+    const rows = [
+      ['Date', 'Category', 'Amount', 'Payment Method', 'Note', 'Tags', 'Paid By', 'Split Among'].map(escapeCsv).join(','),
+      ...expenses.map((expense) => [
+        new Date(expense.date).toISOString().slice(0, 10),
+        expense.category?.name || 'Uncategorized',
+        Number(expense.amount).toFixed(2),
+        expense.paymentMethod,
+        expense.note || '',
+        (expense.tags || []).join(' | '),
+        expense.paidBy || '',
+        (expense.splitAmong || []).join(' | '),
+      ].map(escapeCsv).join(',')),
+    ];
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="trip-${trip.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.csv"`);
+    res.send(rows.join('\n'));
+  } catch (error) {
+    next(error);
+  }
+});
 
 router.get('/', async (req, res, next) => {
   try {
@@ -208,7 +277,9 @@ router.post('/:id/expenses', expenseRules, async (req, res, next) => {
       note: req.body.note || '',
       paymentMethod: req.body.paymentMethod || 'Card',
       trip: trip._id,
-      tags: Array.isArray(req.body.tags) ? req.body.tags : [],
+      tags: normalizeTags(req.body.tags),
+      paidBy: req.body.paidBy || null,
+      splitAmong: normalizeSplitAmong(req.body.splitAmong),
     });
 
     return res.redirect(`/trips/${trip._id}`);

@@ -13,7 +13,7 @@
   <article class="summary-card summary-card-main">
     <div class="card-heading">
       <span>Spent this month</span>
-      <span class="status-pill"><%= summary.budget ? (summary.percentUsed >= 100 ? 'At limit' : 'On track') : 'No budget' %></span>
+      <span class="status-pill"><%= summary.budgetAlert.label %></span>
     </div>
     <p class="amount-large"><%= currencySymbol %><%= summary.spent.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></p>
     <div class="progress-track" role="progressbar" aria-label="Monthly budget used" aria-valuenow="<%= Math.round(summary.percentUsed) %>" aria-valuemin="0" aria-valuemax="100">
@@ -32,6 +32,46 @@
     <% } else { %>
       <p class="muted-copy">No spending recorded yet</p>
     <% } %>
+  </article>
+</section>
+
+<% if (summary.budgetAlert) { %>
+  <section class="page-section reveal">
+    <div class="alert-banner alert-<%= summary.budgetAlert.tone %>">
+      <strong><%= summary.budgetAlert.label %></strong>
+      <span><%= summary.budget ? `You have used ${Math.round(summary.percentUsed)}% of your budget for the month.` : 'Set a monthly budget to start comparing your pace.' %></span>
+    </div>
+  </section>
+<% } %>
+
+<section class="insights-grid page-section reveal">
+  <article class="summary-card">
+    <span class="card-label">Insights</span>
+    <p class="amount-medium"><%= insight.topCategory ? insight.topCategory.name : 'No category yet' %></p>
+    <p class="muted-copy"><%= insight.topCategory ? `Top spending category at ${currencySymbol}${Number(insight.topCategory.total).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'Add expenses to unlock the category breakdown.' %></p>
+    <div class="insight-pairs">
+      <div>
+        <small>Biggest expense</small>
+        <strong><%= insight.biggestExpense ? `${currencySymbol}${Number(insight.biggestExpense.amount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '—' %></strong>
+      </div>
+      <div>
+        <small>Vs. last month</small>
+        <strong><%= insight.comparison ? `${insight.comparison >= 0 ? '+' : ''}${insight.comparison.toFixed(1)}%` : '—' %></strong>
+      </div>
+    </div>
+  </article>
+  <article class="summary-card">
+    <span class="card-label">Quick stats</span>
+    <div class="quick-stat-grid">
+      <div>
+        <small>Trips</small>
+        <strong><%= trips.length %></strong>
+      </div>
+      <div>
+        <small>Recurring</small>
+        <strong><%= recurringCount %></strong>
+      </div>
+    </div>
   </article>
 </section>
 
@@ -77,6 +117,8 @@
 <section class="quick-links page-section reveal" aria-label="More views">
   <a class="quick-link" href="/reports"><span><strong>Monthly report</strong><small>See where your money goes</small></span><span aria-hidden="true">↗</span></a>
   <a class="quick-link" href="/trips"><span><strong>Trips</strong><small>Keep your travel spending in check</small></span><span aria-hidden="true">↗</span></a>
+  <a class="quick-link" href="/recurring"><span><strong>Recurring</strong><small>Subscriptions and fixed bills</small></span><span aria-hidden="true">↗</span></a>
+  <a class="quick-link" href="/settings"><span><strong>Settings</strong><small>Currency, theme and preferences</small></span><span aria-hidden="true">↗</span></a>
 </section>
 
 <%- include('../partials/expense-modal') %>

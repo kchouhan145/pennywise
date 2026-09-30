@@ -8,6 +8,7 @@ module.exports = [
       sourceType: 'commonjs',
       globals: {
         ...globals.node,
+        ...globals.browser,
       },
     },
     rules: {

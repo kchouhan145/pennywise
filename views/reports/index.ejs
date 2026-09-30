@@ -36,6 +36,9 @@
       <span class="card-label">Safe daily spend</span>
       <p class="amount-medium"><%= currencySymbol %><%= summary.safeDailySpend.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></p>
       <p class="muted-copy"><%= summary.budget ? 'Stay under this amount each day to stay on target.' : 'Set a budget to unlock the safe daily target.' %></p>
+      <div class="card-meta" style="margin-top: 16px;">
+        <a class="text-link" href="/reports/export?month=<%= encodeURIComponent(month) %><%= filters.category ? `&category=${encodeURIComponent(filters.category)}` : '' %><%= filters.paymentMethod && filters.paymentMethod !== 'All' ? `&paymentMethod=${encodeURIComponent(filters.paymentMethod)}` : '' %><%= filters.startDate ? `&startDate=${encodeURIComponent(filters.startDate)}` : '' %><%= filters.endDate ? `&endDate=${encodeURIComponent(filters.endDate)}` : '' %><%= filters.search ? `&search=${encodeURIComponent(filters.search)}` : '' %>">Export CSV</a>
+      </div>
     </article>
   </div>
 
@@ -158,7 +161,7 @@
                     <%= expense.category?.name || 'Uncategorized' %>
                   </span>
                 </td>
-                <td><%= expense.note || '—' %></td>
+                <td><%= expense.note || '—' %><% if (expense.tags && expense.tags.length) { %><br><small class="muted-copy"><%= expense.tags.join(', ') %></small><% } %></td>
                 <td><%= expense.paymentMethod %></td>
                 <td class="amount-column"><%= currencySymbol %><%= expense.formattedAmount %></td>
               </tr>

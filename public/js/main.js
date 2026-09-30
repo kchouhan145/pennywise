@@ -3,9 +3,26 @@ const addExpenseButtons = document.querySelectorAll('[data-add-expense]');
 const modal = document.querySelector('[data-expense-modal]');
 const modalCloseButton = document.querySelector('[data-close-modal]');
 
+const applyTheme = (theme) => {
+  if (theme === 'dark') {
+    document.documentElement.setAttribute('data-dark', 'true');
+    return;
+  }
+
+  document.documentElement.removeAttribute('data-dark');
+};
+
 if (themeToggle) {
+  const storedTheme = localStorage.getItem('pennywise-theme');
+  if (storedTheme) {
+    applyTheme(storedTheme);
+  }
+
   themeToggle.addEventListener('click', () => {
-    document.documentElement.toggleAttribute('data-dark');
+    const isDark = document.documentElement.hasAttribute('data-dark');
+    const nextTheme = isDark ? 'light' : 'dark';
+    localStorage.setItem('pennywise-theme', nextTheme);
+    applyTheme(nextTheme);
   });
 }
 

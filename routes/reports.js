@@ -35,7 +35,61 @@ function buildMonthOptions() {
   return options;
 }
 
+function escapeCsv(value) {
+  return `"${String(value ?? '').replace(/"/g, '""')}"`;
+}
+
 router.use(requireAuth);
+
+router.get('/export', async (req, res, next) => {
+  try {
+    const selectedMonth = req.query.month || formatMonthFromDate(new Date());
+    const { year, monthNumber } = getMonthParts(selectedMonth);
+    const startOfMonth = new Date(year, monthNumber - 1, 1);
+    const endOfMonth = new Date(year, monthNumber, 1);
+    const userId = req.session.userId;
+    const query = { user: userId, date: { $gte: startOfMonth, $lt: endOfMonth } };
+
+    if (req.query.category) {
+      query.category = req.query.category;
+    }
+    if (req.query.paymentMethod && req.query.paymentMethod !== 'All') {
+      query.paymentMethod = req.query.paymentMethod;
+    }
+    if (req.query.startDate) {
+      query.date.$gte = new Date(req.query.startDate);
+    }
+    if (req.query.endDate) {
+      query.date.$lt = new Date(new Date(req.query.endDate).getTime() + 24 * 60 * 60 * 1000);
+    }
+    if (req.query.search) {
+      query.note = { $regex: req.query.search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' };
+    }
+
+    const expenses = await Expense.find(query)
+      .sort({ date: -1, createdAt: -1 })
+      .populate('category', 'name')
+      .lean();
+
+    const rows = [
+      ['Date', 'Category', 'Amount', 'Payment Method', 'Note', 'Tags'].map(escapeCsv).join(','),
+      ...expenses.map((expense) => [
+        new Date(expense.date).toISOString().slice(0, 10),
+        expense.category?.name || 'Uncategorized',
+        Number(expense.amount).toFixed(2),
+        expense.paymentMethod,
+        expense.note || '',
+        (expense.tags || []).join(' | '),
+      ].map(escapeCsv).join(',')),
+    ];
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="monthly-report-${selectedMonth}.csv"`);
+    res.send(rows.join('\n'));
+  } catch (error) {
+    next(error);
+  }
+});
 
 router.get('/', async (req, res, next) => {
   try {

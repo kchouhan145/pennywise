@@ -9,8 +9,9 @@
       <a class="nav-link <%= currentPath === '/' ? 'is-active' : '' %>" href="/">Home</a>
       <a class="nav-link <%= currentPath === '/reports' ? 'is-active' : '' %>" href="/reports">Monthly</a>
       <a class="nav-link <%= currentPath === '/trips' ? 'is-active' : '' %>" href="/trips">Trips</a>
+      <a class="nav-link <%= currentPath === '/recurring' ? 'is-active' : '' %>" href="/recurring">Recurring</a>
       <a class="nav-link <%= currentPath === '/categories' ? 'is-active' : '' %>" href="/categories">Categories</a>
-      <a class="nav-link" href="#settings">Settings</a>
+      <a class="nav-link <%= currentPath === '/settings' ? 'is-active' : '' %>" href="/settings">Settings</a>
     </div>
     <form method="post" action="/auth/logout">
       <button class="nav-logout" type="submit">Log out</button>

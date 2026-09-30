@@ -10,6 +10,8 @@ const categoryRoutes = require('./routes/categories');
 const expenseRoutes = require('./routes/expenses');
 const reportsRoutes = require('./routes/reports');
 const tripsRoutes = require('./routes/trips');
+const recurringRoutes = require('./routes/recurring');
+const settingsRoutes = require('./routes/settings');
 
 const app = express();
 
@@ -32,6 +34,8 @@ app.use('/categories', categoryRoutes);
 app.use('/expenses', expenseRoutes);
 app.use('/reports', reportsRoutes);
 app.use('/trips', tripsRoutes);
+app.use('/recurring', recurringRoutes);
+app.use('/settings', settingsRoutes);
 app.use('/', homeRoutes);
 
 app.use((req, res) => {

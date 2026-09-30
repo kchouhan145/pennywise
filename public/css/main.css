@@ -71,6 +71,37 @@ h3 { font-size: 1.15rem; margin-bottom: 8px; }
 .card-meta { margin-top: 10px; }
 .section-heading { display: flex; align-items: end; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 17px; margin-bottom: 14px; }
 .text-link { color: var(--accent); font-size: 0.88rem; font-weight: 600; }
+.alert-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.alert-banner strong,
+.alert-banner span { display: block; }
+.alert-banner span { color: var(--muted); }
+.alert-info { border-color: rgba(45, 121, 88, 0.18); background: var(--accent-soft); }
+.alert-warning { background: rgba(245, 158, 11, 0.09); border-color: rgba(245, 158, 11, 0.28); }
+.alert-danger { background: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.22); }
+.insights-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.insight-pairs,
+.quick-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+}
+.insight-pairs small,
+.quick-stat-grid small { display: block; color: var(--muted); margin-bottom: 4px; }
 .empty-state { border: 1px dashed var(--line); border-radius: 12px; padding: 54px 20px; text-align: center; }
 .empty-icon { display: grid; place-items: center; width: 42px; height: 42px; margin: 0 auto 18px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); }
 .empty-state p { color: var(--muted); margin-bottom: 24px; }
