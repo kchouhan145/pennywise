@@ -180,6 +180,18 @@ router.post('/', tripRules, async (req, res, next) => {
   }
 });
 
+router.post('/:id/delete', async (req, res, next) => {
+  try {
+    const trip = await Trip.findOneAndDelete({ _id: req.params.id, user: req.session.userId });
+    if (trip) {
+      await Expense.deleteMany({ user: req.session.userId, trip: trip._id });
+    }
+    return res.redirect('/trips');
+  } catch (error) {
+    return next(error);
+  }
+});
+
 router.get('/:id', async (req, res, next) => {
   try {
     const trip = await Trip.findOne({ _id: req.params.id, user: req.session.userId }).lean();

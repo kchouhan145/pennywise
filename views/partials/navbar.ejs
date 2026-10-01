@@ -14,6 +14,7 @@
       <a class="nav-link <%= currentPath === '/settings' ? 'is-active' : '' %>" href="/settings">Settings</a>
     </div>
     <form method="post" action="/auth/logout">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
       <button class="nav-logout" type="submit">Log out</button>
     </form>
     <% } else { %>

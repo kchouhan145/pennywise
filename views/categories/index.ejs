@@ -9,6 +9,7 @@
 
   <div class="category-layout">
     <form class="panel-form" method="post" action="/categories">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
       <h3>Add category</h3>
       <% if (errors.length) { %>
         <div class="form-errors" role="alert">
@@ -44,15 +45,16 @@
         <div class="category-list">
           <% categories.forEach((category) => { %>
             <div class="category-item">
-              <div class="category-row">
-                <span class="category-swatch" style="background:<%= category.color %>"><%= category.icon %></span>
-                <div>
-                  <strong><%= category.name %></strong>
-                  <% if (category.isDefault) { %><small>Default</small><% } %>
-                </div>
-              </div>
-              <% if (!category.isDefault) { %>
+              <form class="category-row category-edit-form" method="post" action="/categories/<%= category._id %>/update">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                <input type="color" name="color" value="<%= category.color %>" aria-label="Color for <%= category.name %>" />
+                <input type="text" name="icon" value="<%= category.icon %>" maxlength="4" aria-label="Icon for <%= category.name %>" />
+                <input type="text" name="name" value="<%= category.name %>" maxlength="40" required aria-label="Name for <%= category.name %>" />
+                <button class="link-button" type="submit">Save</button>
+              </form>
+              <% if (category.isDefault) { %><small>Default</small><% } else { %>
                 <form method="post" action="/categories/<%= category._id %>/delete" onsubmit="return confirm('Delete this category and move its expenses to Other?');">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
                   <button class="ghost-button" type="submit">Delete</button>
                 </form>
               <% } %>

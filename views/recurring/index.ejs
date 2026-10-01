@@ -20,6 +20,7 @@
       <% } %>
 
       <form class="mini-form" method="post" action="/recurring">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
         <div class="input-row two-up">
           <label>
             Amount
@@ -94,9 +95,11 @@
                 <span class="expense-amount">₹<%= item.formattedAmount %></span>
                 <div class="expense-actions">
                   <form method="post" action="/recurring/<%= item._id %>/toggle">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
                     <button type="submit" class="link-button"><%= item.active ? 'Pause' : 'Resume' %></button>
                   </form>
                   <form method="post" action="/recurring/<%= item._id %>/delete">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
                     <button type="submit" class="link-button">Delete</button>
                   </form>
                 </div>

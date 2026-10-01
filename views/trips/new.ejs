@@ -16,6 +16,7 @@
   <% } %>
 
   <form class="panel-form" method="post" action="/trips">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
     <div class="input-row two-up">
       <label>
         Trip name

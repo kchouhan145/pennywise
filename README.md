@@ -2,7 +2,7 @@
 
 A minimal, calm expense tracker built with Node.js, Express, EJS, and MongoDB.
 
-## Phase 1 setup
+## Setup
 
 1. Install Node.js 20 or newer and MongoDB.
 2. Install dependencies:
@@ -11,7 +11,7 @@ A minimal, calm expense tracker built with Node.js, Express, EJS, and MongoDB.
    npm install
    ```
 
-3. Copy `.env.example` to `.env` and set `MONGODB_URI`.
+3. Copy `.env.example` to `.env`, set a unique `SESSION_SECRET`, and confirm `MONGODB_URI`.
 4. Start the development server:
 
    ```bash
@@ -20,8 +20,19 @@ A minimal, calm expense tracker built with Node.js, Express, EJS, and MongoDB.
 
 5. Open http://localhost:3000.
 
-The `/health` endpoint returns the service status without rendering a view.
+The app uses MongoDB-backed sessions, Helmet security headers, CSRF protection for every POST form, and rate limiting on login and registration.
 
-## Phase 2 authentication
+## Tests and linting
+
+```bash
+npm test
+npm run lint
+```
+
+## Account and data controls
+
+The Settings page supports currency, theme, and monthly trip inclusion preferences. Categories can be added, renamed, recolored, and have their icons edited; deleting a custom category reassigns its expenses to `Other`. Trips can be deleted from the Trips list or detail page, which also removes their expenses. Account deletion removes the signed-in user and all related data.
+
+## Authentication
 
 Visit `/auth/register` to create an account. Sessions are stored in MongoDB and last for seven days. The home dashboard is protected and redirects logged-out visitors to `/auth/login`.

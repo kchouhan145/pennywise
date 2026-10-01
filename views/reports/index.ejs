@@ -48,6 +48,7 @@
         <h2>Set monthly budget</h2>
       </div>
       <form class="mini-form" method="post" action="/reports/budget">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
         <input type="hidden" name="month" value="<%= month %>" />
         <label>
           Budget amount

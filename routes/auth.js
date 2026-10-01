@@ -1,4 +1,5 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 
 const User = require('../models/User');
@@ -6,6 +7,14 @@ const Category = require('../models/Category');
 const { redirectIfAuthenticated } = require('../middleware/auth');
 
 const router = express.Router();
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: 'Too many authentication attempts. Please try again later.',
+});
 
 const registrationRules = [
   body('name').trim().isLength({ min: 2, max: 80 }).withMessage('Enter your name.'),
@@ -38,7 +47,7 @@ function renderLogin(req, res, errors = []) {
 
 router.get('/register', redirectIfAuthenticated, (req, res) => renderRegister(req, res));
 
-router.post('/register', redirectIfAuthenticated, registrationRules, async (req, res, next) => {
+router.post('/register', authLimiter, redirectIfAuthenticated, registrationRules, async (req, res, next) => {
   const errors = validationResult(req).array();
   if (errors.length) {
     return renderRegister(req, res, errors);
@@ -64,7 +73,7 @@ router.post('/register', redirectIfAuthenticated, registrationRules, async (req,
 
 router.get('/login', redirectIfAuthenticated, (req, res) => renderLogin(req, res));
 
-router.post('/login', redirectIfAuthenticated, loginRules, async (req, res, next) => {
+router.post('/login', authLimiter, redirectIfAuthenticated, loginRules, async (req, res, next) => {
   const errors = validationResult(req).array();
   if (errors.length) {
     return renderLogin(req, res, errors);

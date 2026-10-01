@@ -97,6 +97,7 @@
             <div class="expense-actions">
               <a href="/expenses/<%= expense._id %>/edit">Edit</a>
               <form method="post" action="/expenses/<%= expense._id %>/delete">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
                 <button type="submit" class="link-button">Delete</button>
               </form>
             </div>

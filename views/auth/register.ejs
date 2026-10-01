@@ -5,6 +5,7 @@
     <p class="intro-copy">A gentle place to notice where your money goes.</p>
   </div>
   <form class="auth-form" method="post" action="/auth/register">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
     <div class="form-heading"><h2>Create your account</h2><p>It takes less than a minute.</p></div>
     <% if (errors.length) { %><div class="form-errors" role="alert"><% errors.forEach((error) => { %><p><%= error.msg %></p><% }) %></div><% } %>
     <label for="name">Name<input id="name" name="name" type="text" value="<%= formData.name %>" autocomplete="name" required autofocus /></label>

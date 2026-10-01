@@ -15,6 +15,7 @@
     <% } %>
 
     <form class="mini-form" method="post" action="/settings">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
       <div class="input-row two-up">
         <label>
           Default currency
@@ -41,6 +42,17 @@
       </label>
 
       <button class="primary-button" type="submit">Save preferences</button>
+    </form>
+  </section>
+
+  <section class="panel-block danger-zone">
+    <div class="panel-header">
+      <h2>Account</h2>
+      <p class="muted-copy">Delete your account and all associated expenses, trips, budgets and categories.</p>
+    </div>
+    <form method="post" action="/settings/delete-account" onsubmit="return confirm('Delete your account and all of your data? This cannot be undone.');">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      <button class="ghost-button" type="submit">Delete account</button>
     </form>
   </section>
 </section>

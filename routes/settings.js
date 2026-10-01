@@ -2,6 +2,11 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 
 const User = require('../models/User');
+const Category = require('../models/Category');
+const Expense = require('../models/Expense');
+const MonthlyBudget = require('../models/MonthlyBudget');
+const RecurringExpense = require('../models/RecurringExpense');
+const Trip = require('../models/Trip');
 const { requireAuth } = require('../middleware/auth');
 
 const router = express.Router();
@@ -61,6 +66,28 @@ router.post('/', settingsRules, async (req, res, next) => {
     await user.save();
 
     return res.redirect('/settings');
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.post('/delete-account', async (req, res, next) => {
+  try {
+    const userId = req.session.userId;
+    await Promise.all([
+      Category.deleteMany({ user: userId }),
+      Expense.deleteMany({ user: userId }),
+      MonthlyBudget.deleteMany({ user: userId }),
+      RecurringExpense.deleteMany({ user: userId }),
+      Trip.deleteMany({ user: userId }),
+      User.deleteOne({ _id: userId }),
+    ]);
+
+    return req.session.destroy((error) => {
+      if (error) return next(error);
+      res.clearCookie('pennywise.sid');
+      return res.redirect('/auth/register');
+    });
   } catch (error) {
     return next(error);
   }

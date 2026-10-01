@@ -8,6 +8,7 @@
   </div>
 
   <form class="panel-form" method="post" action="/expenses">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
     <% if (errors.length) { %>
       <div class="form-errors" role="alert">
         <% errors.forEach((error) => { %><p><%= error.msg %></p><% }) %>

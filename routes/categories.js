@@ -78,6 +78,26 @@ router.post('/', categoryRules, async (req, res, next) => {
   }
 });
 
+router.post('/:id/update', categoryRules, async (req, res, next) => {
+  const errors = validationResult(req).array();
+  if (errors.length) {
+    return res.redirect('/categories');
+  }
+
+  try {
+    await Category.updateOne(
+      { _id: req.params.id, user: req.session.userId },
+      { $set: { name: req.body.name, color: req.body.color || '#2d7958', icon: req.body.icon || '•' } },
+    );
+    return res.redirect('/categories');
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.redirect('/categories');
+    }
+    return next(error);
+  }
+});
+
 router.post('/:id/delete', async (req, res, next) => {
   try {
     const category = await Category.findOne({ _id: req.params.id, user: req.session.userId });

@@ -5,6 +5,7 @@
     <p class="intro-copy">Your spending, waiting patiently.</p>
   </div>
   <form class="auth-form" method="post" action="/auth/login">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
     <div class="form-heading"><h2>Log in</h2><p>Continue to your dashboard.</p></div>
     <% if (errors.length) { %><div class="form-errors" role="alert"><% errors.forEach((error) => { %><p><%= error.msg %></p><% }) %></div><% } %>
     <label for="email">Email<input id="email" name="email" type="email" value="<%= formData.email %>" autocomplete="email" required autofocus /></label>
