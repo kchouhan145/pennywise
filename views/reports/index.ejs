@@ -24,7 +24,7 @@
       </div>
       <p class="amount-large"><%= currencySymbol %><%= summary.spent.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></p>
       <div class="progress-track" role="progressbar" aria-label="Monthly budget used" aria-valuenow="<%= Math.round(summary.percentUsed) %>" aria-valuemin="0" aria-valuemax="100">
-        <span style="width: <%= summary.budget ? `${Math.min(summary.percentUsed, 100)}%` : '0%' %>"></span>
+        <span data-progress-width="<%= summary.budget ? Math.min(summary.percentUsed, 100) : 0 %>"></span>
       </div>
       <div class="card-meta">
         <span>Budget: <%= currencySymbol %><%= summary.budget.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></span>
@@ -110,7 +110,13 @@
         <h2>Category breakdown</h2>
       </div>
       <% if (categoryBreakdown.length) { %>
-        <canvas id="categoryChart" height="220"></canvas>
+        <canvas
+          id="categoryChart"
+          height="220"
+          data-labels="<%= JSON.stringify(categoryBreakdown.map((item) => item.name)) %>"
+          data-values="<%= JSON.stringify(categoryBreakdown.map((item) => item.total)) %>"
+          data-colors="<%= JSON.stringify(categoryBreakdown.map((item) => item.color || '#2d7958')) %>"
+        ></canvas>
       <% } else { %>
         <div class="empty-state compact">
           <div class="empty-icon" aria-hidden="true">✦</div>
@@ -125,7 +131,12 @@
         <h2>Daily spending</h2>
       </div>
       <% if (dailyTotals.some((day) => day.total > 0)) { %>
-        <canvas id="dailyChart" height="220"></canvas>
+        <canvas
+          id="dailyChart"
+          height="220"
+          data-labels="<%= JSON.stringify(dailyTotals.map((day) => `${day.day}`)) %>"
+          data-values="<%= JSON.stringify(dailyTotals.map((day) => day.total)) %>"
+        ></canvas>
       <% } else { %>
         <div class="empty-state compact">
           <div class="empty-icon" aria-hidden="true">✦</div>
@@ -158,7 +169,7 @@
                 <td><%= expense.dateLabel %></td>
                 <td>
                   <span class="inline-category">
-                    <span class="category-dot" style="background: <%= expense.category?.color || '#64748b' %>"></span>
+                    <span class="category-dot" data-category-color="<%= expense.category?.color || '#64748b' %>"></span>
                     <%= expense.category?.name || 'Uncategorized' %>
                   </span>
                 </td>
@@ -181,65 +192,4 @@
 </section>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  const categoryChartEl = document.getElementById('categoryChart');
-  if (categoryChartEl) {
-    const categoryLabels = <%- JSON.stringify(categoryBreakdown.map((item) => item.name)) %>;
-    const categoryValues = <%- JSON.stringify(categoryBreakdown.map((item) => item.total)) %>;
-    const categoryColors = <%- JSON.stringify(categoryBreakdown.map((item) => item.color || '#2d7958')) %>;
-
-    new Chart(categoryChartEl, {
-      type: 'doughnut',
-      data: {
-        labels: categoryLabels,
-        datasets: [{
-          data: categoryValues,
-          backgroundColor: categoryColors,
-          borderWidth: 0,
-        }],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { position: 'bottom' },
-        },
-        cutout: '58%',
-      },
-    });
-  }
-
-  const dailyChartEl = document.getElementById('dailyChart');
-  if (dailyChartEl) {
-    const dayLabels = <%- JSON.stringify(dailyTotals.map((day) => `${day.day}`)) %>;
-    const dayValues = <%- JSON.stringify(dailyTotals.map((day) => day.total)) %>;
-
-    new Chart(dailyChartEl, {
-      type: 'bar',
-      data: {
-        labels: dayLabels,
-        datasets: [{
-          label: 'Spend',
-          data: dayValues,
-          backgroundColor: '#2d7958',
-          borderRadius: 6,
-        }],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              callback: (value) => `₹${value}`,
-            },
-          },
-        },
-      },
-    });
-  }
-</script>
+<script src="/js/reports.js" defer></script>

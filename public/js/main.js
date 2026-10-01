@@ -2,6 +2,16 @@ const themeToggle = document.querySelector('[data-theme-toggle]');
 const addExpenseButtons = document.querySelectorAll('[data-add-expense]');
 const modal = document.querySelector('[data-expense-modal]');
 const modalCloseButton = document.querySelector('[data-close-modal]');
+const progressBars = document.querySelectorAll('[data-progress-width]');
+const categoryDots = document.querySelectorAll('[data-category-color]');
+
+progressBars.forEach((progressBar) => {
+  progressBar.style.width = `${progressBar.dataset.progressWidth}%`;
+});
+
+categoryDots.forEach((categoryDot) => {
+  categoryDot.style.backgroundColor = categoryDot.dataset.categoryColor;
+});
 
 const applyTheme = (theme) => {
   if (theme === 'dark') {
