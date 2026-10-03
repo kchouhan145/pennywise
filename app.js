@@ -37,6 +37,10 @@ app.set('layout', 'layouts/main');
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store');
+  next();
+});
 app.use(createSessionMiddleware());
 app.use(csrf());
 app.use((req, res, next) => {
@@ -47,6 +51,7 @@ app.use(loadCurrentUser);
 
 app.locals.appName = 'Pennywise';
 app.locals.currencySymbol = '₹';
+app.locals.currentUser = null;
 
 app.use('/auth', authRoutes);
 app.use('/categories', categoryRoutes);
