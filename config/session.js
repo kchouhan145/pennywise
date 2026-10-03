@@ -13,6 +13,7 @@ function createSessionMiddleware() {
     secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
+    proxy: true,
     store: MongoStore.create({
       mongoUrl: process.env.MONGODB_URI,
       collectionName: 'sessions',
