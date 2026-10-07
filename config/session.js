@@ -21,7 +21,9 @@ function createSessionMiddleware() {
     cookie: {
       httpOnly: true,
       sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
+      // Detect HTTPS from the forwarded protocol so preview and custom deployments
+      // do not lose the session cookie when NODE_ENV is set to production.
+      secure: 'auto',
       maxAge: 1000 * 60 * 60 * 24 * 7,
     },
   });
